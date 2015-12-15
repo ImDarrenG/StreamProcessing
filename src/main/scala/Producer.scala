@@ -1,4 +1,5 @@
 import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerRecord
 import java.util.Properties
 
 object Producer extends App {
@@ -11,6 +12,15 @@ object Producer extends App {
     props.put("value.serializer",
       "org.apache.kafka.common.serialization.StringSerializer");
 
-    val producer = new KafkaProducer(props)
-    producer.close()
+    val producer = new KafkaProducer[java.lang.String, java.lang.String](props)
+
+    try {
+      for (i <- 1 to 100) {
+        producer.send(new ProducerRecord[java.lang.String, java.lang.String](
+          "test-topic", Integer.toString(i), Integer.toString(i)))
+      }
+    } finally {
+      producer.close()
+    }
+
 }
